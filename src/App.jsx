@@ -2,11 +2,20 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MapPin, Navigation, Calendar as CalendarIcon, CloudRain, Sun, Camera, Star, Plus, ArrowRight, ArrowLeft, Plane, CreditCard, Ticket, Wallet, Trash2, Hotel, ClipboardCheck, CheckSquare, Square, Link as LinkIcon, Train, Utensils, Gift, X, ChevronLeft, ChevronRight, Cloud, Umbrella, Clock } from 'lucide-react';
 
 // ==========================================
-// 🎨 風格設定
+// 🎨 風格設定 (修正背景滿版問題)
 // ==========================================
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&display=swap');
   
+  /* 1. 強制全域背景色 (解決手機回彈露白底問題) */
+  html, body, #root {
+    background-color: #F9F8F6;
+    margin: 0;
+    padding: 0;
+    font-family: 'Shippori Mincho', serif !important;
+    min-height: 100vh;
+  }
+
   body, button, input, textarea, select {
     font-family: 'Shippori Mincho', serif !important;
   }
@@ -69,7 +78,7 @@ const styles = `
 `;
 
 // ==========================================
-// 🌦️ 模擬天氣
+// 🌦️ 模擬天氣邏輯
 // ==========================================
 const getOutfitRecommendation = (temp) => {
   if (temp < 10) return "建議穿著厚大衣、圍巾，注意保暖。";
@@ -89,15 +98,22 @@ const fetchMockWeather = (city, dateStr) => {
       else if (month >= 6 && month <= 9) { baseTemp = 30; type = 'sun'; } 
       else { baseTemp = 18; type = 'rain'; } 
       const randomVar = Math.floor(Math.random() * 5) - 2;
-      resolve({ temp: baseTemp + randomVar, icon: type, desc: type === 'sun' ? 'Sunny' : type === 'cloud' ? 'Cloudy' : 'Rainy', pop: type === 'rain' ? 60 : 10 });
+      resolve({
+        temp: baseTemp + randomVar,
+        icon: type, 
+        desc: type === 'sun' ? 'Sunny' : type === 'cloud' ? 'Cloudy' : 'Rainy',
+        pop: type === 'rain' ? 60 : 10
+      });
     }, 300);
   });
 };
 
 // ==========================================
-// 🛠️ 工具函數
+// 🛠️ 日期工具
 // ==========================================
-const formatDateStr = (dateObj) => dateObj.toISOString().split('T')[0];
+const formatDateStr = (dateObj) => { 
+  return dateObj.toISOString().split('T')[0];
+};
 
 const formatDisplayDate = (dateStr) => { 
   const date = new Date(dateStr.replace(/\./g, '-'));
@@ -114,6 +130,11 @@ const getDaysLeft = (startDateStr) => {
   const target = new Date(startDateStr.replace(/\./g, '-'));
   const diffTime = target - today;
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
+
+const getMonthName = (monthNum) => {
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  return months[parseInt(monthNum) - 1] || "";
 };
 
 // ==========================================
